@@ -2315,7 +2315,7 @@ no parameters.
 <sup>[[link](#optimize)]</sup>
 
 * <a name="hack"></a>
-  Use `HACK` to note code smells where questionable coding practices were used
+  Use `JANKY` (or `JAF`) to note code smells where questionable coding practices were used
   and should be refactored away.
 <sup>[[link](#hack)]</sup>
 
