@@ -2250,7 +2250,7 @@ no parameters.
 
 ### Inline API Documentation
 * <a name="rdoc-conventions"></a>
-  Use [YARD][http://yardoc.org/] and its conventions for API documentation. Don't put an
+  Use [YARD][yard] and its conventions for API documentation. Don't put an
   empty line between the comment block and the `def`.
 <sup>[[link](#rdoc-conventions)]</sup>
 
@@ -3976,4 +3976,4 @@ Cheers,<br>
 [trpl]: http://www.amazon.com/Ruby-Programming-Language-David-Flanagan/dp/0596516177
 [Pandoc]: http://pandoc.org/
 [RuboCop]: https://github.com/bbatsov/rubocop
-[rdoc]: http://rdoc.sourceforge.net/doc/
+[yard]: http://yardoc.org/
