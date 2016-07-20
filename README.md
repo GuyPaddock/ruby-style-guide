@@ -82,6 +82,7 @@ Translations of the guide are available in the following languages:
 * [Syntax](#syntax)
 * [Naming](#naming)
 * [Comments](#comments)
+  * [Inline API Documentation](#inline-api-documentation) 
   * [Comment Annotations](#comment-annotations)
 * [Classes & Modules](#classes--modules)
 * [Exceptions](#exceptions)
@@ -164,11 +165,8 @@ Translations of the guide are available in the following languages:
   class FooError < StandardError
   end
 
-  # okish
-  class FooError < StandardError; end
-
   # good
-  FooError = Class.new(StandardError)
+  class FooError < StandardError; end
   ```
 
 * <a name="no-single-line-methods"></a>
@@ -591,11 +589,6 @@ Translations of the guide are available in the following languages:
   num = 1234
   ```
 
-* <a name="rdoc-conventions"></a>
-    Use [Rdoc][rdoc] and its conventions for API documentation.  Don't put an
-    empty line between the comment block and the `def`.
-<sup>[[link](#rdoc-conventions)]</sup>
-
 * <a name="80-character-limits"></a>
   Limit lines to 80 characters.
 <sup>[[link](#80-character-limits)]</sup>
@@ -607,23 +600,6 @@ Translations of the guide are available in the following languages:
 * <a name="newline-eof"></a>
   End each file with a newline.
 <sup>[[link](#newline-eof)]</sup>
-
-* <a name="no-block-comments"></a>
-    Don't use block comments. They cannot be preceded by whitespace and are not
-    as easy to spot as regular comments.
-<sup>[[link](#no-block-comments)]</sup>
-
-  ```Ruby
-  # bad
-  =begin
-  comment line
-  another comment line
-  =end
-
-  # good
-  # comment line
-  # another comment line
-  ```
 
 ## Syntax
 
@@ -905,22 +881,27 @@ Translations of the guide are available in the following languages:
   ```
 
 * <a name="ternary-operator"></a>
-  Favor the ternary operator(`?:`) over `if/then/else/end` constructs.
-  It's more common and obviously more concise.
+  Favor `if/then/else/end` constructs over the ternary operator(`?:`).
+  Although more common and concise, it increases the cognitive load of the reader.
 <sup>[[link](#ternary-operator)]</sup>
 
   ```Ruby
   # bad
-  result = if some_condition then something else something_else end
+  result = some_condition ? something : something_else
 
   # good
-  result = some_condition ? something : something_else
+  result =
+    if some_condition
+      something
+    else
+      something_else
+    end
   ```
 
 * <a name="no-nested-ternary"></a>
-  Use one expression per branch in a ternary operator. This
-  also means that ternary operators must not be nested. Prefer
-  `if/else` constructs in these cases.
+  If you must use a ternary operator, use one expression per branch in
+  a ternary operator. This also means that ternary operators must not be
+  nested. It is still more preferable to use `if/else` constructs.
 <sup>[[link](#no-nested-ternary)]</sup>
 
   ```Ruby
@@ -933,19 +914,6 @@ Translations of the guide are available in the following languages:
   else
     something_else
   end
-  ```
-
-* <a name="no-semicolon-ifs"></a>
-  Do not use `if x; ...`. Use the ternary
-  operator instead.
-<sup>[[link](#no-semicolon-ifs)]</sup>
-
-  ```Ruby
-  # bad
-  result = if some_condition; something else something_else end
-
-  # good
-  result = some_condition ? something : something_else
   ```
 
 * <a name="use-if-case-returns"></a>
@@ -1917,20 +1885,20 @@ no parameters.
   end
   ```
 
-  Prefer `next` in loops instead of conditional blocks.
+  Prefer conditional blocks over `next` in loops.
 
   ```Ruby
   # bad
   [0, 1, 2, 3].each do |item|
-    if item > 1
-      puts item
-    end
+    next unless item > 1
+    puts item
   end
 
   # good
   [0, 1, 2, 3].each do |item|
-    next unless item > 1
-    puts item
+    if item > 1
+      puts item
+    end
   end
   ```
 
@@ -2222,13 +2190,26 @@ no parameters.
 > it even clearer. <br>
 > -- Steve McConnell
 
-* <a name="no-comments"></a>
-  Write self-documenting code and ignore the rest of this section. Seriously!
-<sup>[[link](#no-comments)]</sup>
-
 * <a name="english-comments"></a>
   Write comments in English.
 <sup>[[link](#english-comments)]</sup>
+
+* <a name="no-block-comments"></a>
+  Don't use block comments. They cannot be preceded by whitespace and are not
+  as easy to spot as regular comments.
+<sup>[[link](#no-block-comments)]</sup>
+
+  ```Ruby
+  # bad
+  =begin
+  comment line
+  another comment line
+  =end
+
+  # good
+  # comment line
+  # another comment line
+  ```
 
 * <a name="hash-space"></a>
   Use one space between the leading `#` character of the comment and the text
@@ -2261,6 +2242,25 @@ no parameters.
   Avoid writing comments to explain bad code. Refactor the code to make it
   self-explanatory. ("Do or do not&mdash;there is no try." Yoda)
 <sup>[[link](#refactor-dont-comment)]</sup>
+
+* <a name="no-comments"></a>
+  Write self-documenting code so you can ignore most of this section. Seriously!
+  (This does not apply to API Documentation, explained below).
+<sup>[[link](#no-comments)]</sup>
+
+### Inline API Documentation
+* <a name="rdoc-conventions"></a>
+  Use [YARD][http://yardoc.org/] and its conventions for API documentation. Don't put an
+  empty line between the comment block and the `def`.
+<sup>[[link](#rdoc-conventions)]</sup>
+
+* All public and protected methods in a class are considered its "API" and must
+  be documented. Documentation on private methods is encouraged but not required as long
+  as the methods are named intuitively and their logic is concise and clear.
+  
+* When working in legacy code that lacks API documentation, write docs for all
+  public and protected methods you touch. If possible, aim to document all of the API of
+  each class.
 
 ### Comment Annotations
 
@@ -2320,15 +2320,17 @@ no parameters.
 <sup>[[link](#hack)]</sup>
 
 * <a name="review"></a>
-  Use `REVIEW` to note anything that should be looked at to confirm it is
-  working as intended. For example: `REVIEW: Are we sure this is how the client
+  Use `BUGBUG` to note anything that should be looked at to confirm it is
+  working as intended. For example: `BUGBUG: Are we sure this is how the client
   does X currently?`
 <sup>[[link](#review)]</sup>
 
-* <a name="document-annotations"></a>
-  Use other custom annotation keywords if it feels appropriate, but be sure to
-  document them in your project's `README` or similar.
-<sup>[[link](#document-annotations)]</sup>
+* <a name="mig"></a>
+  Use `MIG` to bring attention to code that has been added purely for the
+  purposes of a graceful zero-down-time migration in production. After the
+  release, the team should remove any such code encountered while working on
+  code in the same area where the annotation appears.
+<sup>[[link](#mig)]</sup>
 
 ## Classes & Modules
 
@@ -2343,7 +2345,7 @@ no parameters.
     include AnotherModule
 
     # inner classes
-    CustomErrorKlass = Class.new(StandardError)
+    def CustomErrorKlass; end
 
     # constants are next
     SOME_CONSTANT = 20
@@ -2595,42 +2597,6 @@ no parameters.
   attr_reader :one, :two, :three
   ```
 
-* <a name="struct-new"></a>
-  Consider using `Struct.new`, which defines the trivial accessors,
-  constructor and comparison operators for you.
-<sup>[[link](#struct-new)]</sup>
-
-  ```Ruby
-  # good
-  class Person
-    attr_accessor :first_name, :last_name
-
-    def initialize(first_name, last_name)
-      @first_name = first_name
-      @last_name = last_name
-    end
-  end
-
-  # better
-  Person = Struct.new(:first_name, :last_name) do
-  end
-  ```
-
-* <a name="no-extend-struct-new"></a>
-  Don't extend an instance initialized by `Struct.new`. Extending it introduces
-  a superfluous class level and may also introduce weird errors if the file is
-  required multiple times.
-<sup>[[link](#no-extend-struct-new)]</sup>
-
-  ```Ruby
-  # bad
-  class Person < Struct.new(:first_name, :last_name)
-  end
-
-  # good
-  Person = Struct.new(:first_name, :last_name)
-  ```
-
 * <a name="factory-methods"></a>
   Consider adding factory methods to provide additional sensible ways to
   create instances of a particular class.
@@ -2769,54 +2735,6 @@ no parameters.
         # body omitted
       end
     end
-  end
-  ```
-
-* <a name="alias-method-lexically"></a>
-  Prefer `alias` when aliasing methods in lexical class scope as the
-  resolution of `self` in this context is also lexical, and it communicates
-  clearly to the user that the indirection of your alias will not be altered
-  at runtime or by any subclass unless made explicit.
-<sup>[[link](#alias-method-lexically)]</sup>
-
-  ```Ruby
-  class Westerner
-    def first_name
-      @names.first
-    end
-
-    alias given_name first_name
-  end
-  ```
-
-  Since `alias`, like `def`, is a keyword, prefer bareword arguments over
-  symbols or strings. In other words, do `alias foo bar`, not
-  `alias :foo :bar`.
-
-  Also be aware of how Ruby handles aliases and inheritance: an alias
-  references the method that was resolved at the time the alias was defined;
-  it is not dispatched dynamically.
-
-  ```Ruby
-  class Fugitive < Westerner
-    def first_name
-      'Nobody'
-    end
-  end
-  ```
-
-  In this example, `Fugitive#given_name` would still call the original
-  `Westerner#first_name` method, not `Fugitive#first_name`. To override the
-  behavior of `Fugitive#given_name` as well, you'd have to redefine it in the
-  derived class.
-
-  ```Ruby
-  class Fugitive < Westerner
-    def first_name
-      'Nobody'
-    end
-
-    alias given_name first_name
   end
   ```
 
@@ -3112,31 +3030,28 @@ resource cleanup when possible.
   ```
 
 * <a name="percent-w"></a>
-  Prefer `%w` to the literal array syntax when you need an array of words
-  (non-empty strings without spaces and special characters in them).  Apply this
-  rule only to arrays with two or more elements.
+  Prefer the literal array syntax to `%w` when you need an array of words
+  (non-empty strings without spaces and special characters in them).
 <sup>[[link](#percent-w)]</sup>
 
   ```Ruby
   # bad
-  STATES = ['draft', 'open', 'closed']
+  STATES = %w(draft open closed)
 
   # good
-  STATES = %w(draft open closed)
+  STATES = ['draft', 'open', 'closed']
   ```
 
 * <a name="percent-i"></a>
-  Prefer `%i` to the literal array syntax when you need an array of symbols
-  (and you don't need to maintain Ruby 1.9 compatibility). Apply this rule only
-  to arrays with two or more elements.
+  Prefer the literal array syntax to `%i` when you need an array of symbols.
 <sup>[[link](#percent-i)]</sup>
 
   ```Ruby
   # bad
-  STATES = [:draft, :open, :closed]
+  STATES = %i(draft open closed)
 
   # good
-  STATES = %i(draft open closed)
+  STATES = [:draft, :open, :closed]
   ```
 
 * <a name="no-trailing-array-commas"></a>
@@ -3396,14 +3311,8 @@ resource cleanup when possible.
   ```
 
 * <a name="consistent-string-literals"></a>
-  Adopt a consistent string literal quoting style. There are two popular
-  styles in the Ruby community, both of which are considered good&mdash;single
-  quotes by default (Option A) and double quotes by default (Option B).
-<sup>[[link](#consistent-string-literals)]</sup>
-
-  * **(Option A)** Prefer single-quoted strings when you don't need
-    string interpolation or special symbols such as `\t`, `\n`, `'`,
-    etc.
+  Prefer single-quoted strings when you don't need string interpolation or
+  special symbols such as `\t`, `\n`, `'`, etc.
 
     ```Ruby
     # bad
@@ -3412,19 +3321,6 @@ resource cleanup when possible.
     # good
     name = 'Bozhidar'
     ```
-
-  * **(Option B)** Prefer double-quotes unless your string literal
-    contains `"` or escape characters you want to suppress.
-
-    ```Ruby
-    # bad
-    name = 'Bozhidar'
-
-    # good
-    name = "Bozhidar"
-    ```
-
-  The string literals in this guide are aligned with the first style.
 
 * <a name="no-character-literals"></a>
   Don't use the character literal syntax `?x`. Since Ruby 1.9 it's basically
@@ -3894,7 +3790,7 @@ resource cleanup when possible.
 <sup>[[link](#prefer-public-send)]</sup>
 
   ```ruby
-  # We have  an ActiveModel Organization that includes concern Activatable
+  # We have an ActiveModel Organization that includes concern Activatable
   module Activatable
     extend ActiveSupport::Concern
 
