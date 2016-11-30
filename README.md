@@ -2182,6 +2182,12 @@ no parameters.
   end
   ```
 
+* <a name="underscore-variables"></a>
+  When defining instance variables, an underscore preceding the name is not
+  necessary to signal that the variable is meant to be private. The absence of
+  an `attr_reader` declaration should be sufficient in this case.
+<sup>[[link](#underscore-variables)]</sup>
+
 ## Comments
 
 > Good code is its own best documentation. As you're about to add a
