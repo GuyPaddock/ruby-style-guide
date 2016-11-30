@@ -2815,24 +2815,26 @@ no parameters.
   ```
 
 * <a name="begin-implicit"></a>
-  Use *implicit begin blocks* where possible.
+  Avoid *implicit begin blocks*. While traditional Ruby style prefers the 
+  implicit begin block, we believe that the clarity of the begin statement
+  signals intention much more clearly.
 <sup>[[link](#begin-implicit)]</sup>
 
   ```Ruby
   # bad
+  def foo
+    # main logic goes here
+  rescue
+    # failure handling goes here
+  end
+
+  # good
   def foo
     begin
       # main logic goes here
     rescue
       # failure handling goes here
     end
-  end
-
-  # good
-  def foo
-    # main logic goes here
-  rescue
-    # failure handling goes here
   end
   ```
 
