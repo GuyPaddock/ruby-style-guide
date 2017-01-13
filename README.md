@@ -1856,12 +1856,15 @@ no parameters.
 <sup>[[link](#no-flip-flops)]</sup>
 
 * <a name="no-nested-conditionals"></a>
-  Avoid use of nested conditionals for flow of control.
+  Avoid the use of nested conditionals for flow of control.
 <sup>[[link](#no-nested-conditionals)]</sup>
 
-  Prefer a guard clause when you can assert invalid data. A guard clause
-  is a conditional statement at the top of a function that bails out as
-  soon as it can.
+  Consider using "guard clauses" when you can assert invalid data upfront.
+  A guard clause is a conditional statement at the top of a function that
+  bails out as soon as it can.
+
+  Guard clauses are useful when the alternative is code nested two or more
+  levels deep. For example:
 
   ```Ruby
   # bad
@@ -1884,8 +1887,28 @@ no parameters.
     partial_compute(thing)
   end
   ```
+  
+  However, early returns and guard clauses are by no means a silver bullet.
+  Code that must perform computation to decide which of several values to return
+  may read more clearly as conditionals with nesting than with several returns.
+  
+  If a method would otherwise be deeply nested, or if flattening conditionals
+  leads to many seemingly unrelated return statements that are difficult to read
+  ("spaghetti code"), consider a third alternative: it may be more appropriate to
+  break-up the method into several, tightly-scoped short methods that can be
+  composed _without needing deep nesting or guard clauses_.
+  
+  When in doubt, clarity and brevity should be the determining factor. To quote
+  [Martin Fowler's advice from _Refactoring_](https://thepugautomatic.com/2015/01/multiple-return-conditionals/):
+  > Clarity is the key principle: If the method is clearer with one exit
+  > point, use one exit point; otherwise don’t.
 
+  For more reading on this topic, also see:
+  [_Ruby guard clause FTW_](http://dool.in/2014/01/03/ruby-guard-clause-ftw.html)
+
+* <a name="prefer-conditionals-in-loops"></a>
   Prefer conditional blocks over `next` in loops.
+  <sup>[[link](#prefer-conditionals-in-loops)]</sup>
 
   ```Ruby
   # bad
