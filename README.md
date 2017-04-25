@@ -3169,20 +3169,23 @@ resource cleanup when possible.
   ```
 
 * <a name="hash-key"></a>
-  Use `Hash#key?` instead of `Hash#has_key?` and `Hash#value?` instead of
-  `Hash#has_value?`. As noted
-  [here](http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-core/43765) by
-  Matz, the longer forms are considered deprecated.
+  Use `Hash#has_key?` instead of `Hash#key?` and `Hash#has_value?` instead of
+  `Hash#value?`. There is some discussion 
+  [here](https://bugs.ruby-lang.org/issues/10177) regarding a preference from 
+  some of the core team for the shorter forms, but native English speakers in 
+  general and our team specifically prefer the more natural sounding `has_key?`.
+  Given the contention on the subject and heavy use in legacy applications, it
+  is unlikely that `has_key?` is going anywhere soon.
 <sup>[[link](#hash-key)]</sup>
 
   ```Ruby
   # bad
-  hash.has_key?(:test)
-  hash.has_value?(value)
-
-  # good
   hash.key?(:test)
   hash.value?(value)
+
+  # good
+  hash.has_key?(:test)
+  hash.has_value?(value)
   ```
 
 * <a name="hash-each"></a>
