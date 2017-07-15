@@ -1324,13 +1324,12 @@ condition](#safe-assignment-in-condition).
   end
   ```
 
-* <a name="no-self-unless-required"></a>
-  Avoid `self` where not required. (It is only required when calling a self
-  write accessor.)
-<sup>[[link](#no-self-unless-required)]</sup>
+* <a name="use-self-when-required"></a>
+  The use of `self` to refer to the current instance is only strictly required when calling a self-write accessor or using operators, but it can occasionally be useful in other circumstances to aid readability. Many Ruby developers use it sparingly. If `self` is not required, use your best judgment on whether using `self` in a particular snippet of code aids readability or just needlessly lengthens your code. 
+<sup>[[link](#use-self-when-required)]</sup>
 
   ```Ruby
-  # bad
+  # bad: needlessly lengthens code
   def ready?
     if self.last_reviewed_at > self.last_updated_at
       self.worker.update(self.content, self.options)
@@ -1339,13 +1338,35 @@ condition](#safe-assignment-in-condition).
     self.status == :verified
   end
 
-  # good
+  # good: shortens code, but used when required
   def ready?
     if last_reviewed_at > last_updated_at
       worker.update(content, options)
       self.status = :in_progress
     end
     status == :verified
+  end
+
+  # good: aids readability / demonstrates contrast
+  class Student
+    def <=>(other)
+      self.name <=> other.name
+    end
+  end
+  
+  # good: operators would be confusing without `self`
+  class MyItems
+    def initialize(contents: [])
+      @contents = contents
+    end
+  
+    def +(other_items)
+      MyItems.new(@contents + other_items)
+    end
+    
+    def add_fruit
+      self + [:apple, :orange]
+    end
   end
   ```
 
